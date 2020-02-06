@@ -4,6 +4,7 @@ import json
 import os
 import smtplib
 import requests
+from email.message import EmailMessage
 
 # Define some constants
 CFE_COMMITS_ADDRESS = "cfe-commits@lists.llvm.org"
@@ -45,18 +46,25 @@ def format_diff(diff_url):
     return formatted_diff
 
 
+# See: https://docs.python.org/3/library/email.examples.html#email-examples
 def send_email(host, port, username, password, subject, body, mail_to, mail_from=None, reply_to=None):
     if mail_from is None: mail_from = username
     if reply_to is None: reply_to = mail_to
 
-    message = """From: %s\nTo: %s\nReply-To: %s\nSubject: %s\n\n%s""" % (mail_from, mail_to, reply_to, subject, body)
-    print(message)
     try:
+        email = EmailMessage()
+        email.set_content(body)
+        email['Subject'] = subject
+        email['From'] = mail_from
+        email['To'] = mail_to
+        email['Reply-To'] = reply_to
+        print(email)
+        
         server = smtplib.SMTP(host, port)
         server.ehlo()
         server.starttls()
         server.login(username, password)
-        server.sendmail(mail_from, mail_to, message)
+        server.send_message(email)
         server.close()
         return True
     except Exception as ex:
