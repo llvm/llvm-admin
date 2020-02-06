@@ -17,6 +17,7 @@ LLVM_BRANCH_COMMITS_ADDRESS = "llvm-branch-commits@lists.llvm.org"
 LLVM_COMMITS_ADDRESS = "llvm-commits@lists.llvm.org"
 OPENMP_COMMITS_ADDRESS = "openmp-commits@lists.llvm.org"
 PARALLEL_LIBS_COMMITS_ADDRESS = "parallel_libs-commits@lists.llvm.org"
+MLIR_COMMITS_ADDRESS = "mlir-commits@lists.llvm.org"
 
 
 def create_project_list(add_list, modify_list, remove_list):
@@ -90,6 +91,7 @@ def lambda_handler(event, context):
         'lld': LLD_COMMITS_ADDRESS,
         'lldb': LLDB_COMMITS_ADDRESS,
         'llvm': LLVM_COMMITS_ADDRESS,
+        'mlir' : MLIR_COMMITS_ADDRESS,
         'openmp': OPENMP_COMMITS_ADDRESS,
         'parallel-libs': PARALLEL_LIBS_COMMITS_ADDRESS,
         'polly': LLVM_COMMITS_ADDRESS,
