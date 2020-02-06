@@ -3,7 +3,7 @@
 import json
 import os
 import smtplib
-from botocore.vendored import requests
+import requests
 
 # Define some constants
 CFE_COMMITS_ADDRESS = "cfe-commits@lists.llvm.org"
