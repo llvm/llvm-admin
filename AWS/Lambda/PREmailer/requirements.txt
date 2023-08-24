@@ -1,0 +1,4 @@
+requests
+pygithub
+cffi
+urllib3 == 1.26.16
