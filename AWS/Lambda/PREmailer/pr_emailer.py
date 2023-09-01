@@ -173,6 +173,20 @@ def get_pull_request_assigned_email_body(event):
 {user} assigned {pr_html} to {assignee}.
 """
 
+def get_code_review_submitted_email_body(event):
+    user = event['sender']['login']
+    body = event['review']['body']
+    pr_html = event_get_pr_html_url(event)
+
+    return f"""
+{user} wrote:
+
+{body}
+
+{pr_html}
+"""
+
+
 def get_generic_email_body(event, patch):
     user = event['sender']['login']
     pr_html = event_get_pr_html_url(event)
@@ -346,7 +360,9 @@ def lambda_handler(event, context):
         elif action == 'edited':
             body = TODO(event, patch)
         elif action == 'submitted':
-            body = TODO(event, patch)
+            if not event['review']['body']:
+                return get_skip_response("pull_request_review has no body message")
+            body = get_code_review_submitted_email_body(event)
         else:
             body = get_generic_email_body(event, patch)
     else:
