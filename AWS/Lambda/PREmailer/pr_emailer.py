@@ -206,7 +206,7 @@ def is_main_branch_event(event, gh_pr):
 def get_skip_response(message):
     return {
         'statusCode' : 200,
-        'body' : f'{"status" : "true", "message" : "{message}"}'
+        'body' : f'{{"status" : "true", "message" : "{message}"}}'
     }
 
 
