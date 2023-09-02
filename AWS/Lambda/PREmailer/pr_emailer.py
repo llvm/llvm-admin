@@ -50,7 +50,7 @@ def get_reply_to(patch):
 
 
 # See: https://docs.python.org/3/library/email.examples.html#email-examples
-def send_email(host, port, username, password, subject, body, mail_to, mail_from=None, reply_to=None):
+def send_email(host, port, username, password, subject, body, mail_to, mail_from=None, reply_to=None, message_id = None, in_reply_to = None):
     if mail_from is None: mail_from = username
     if reply_to is None: reply_to = mail_to
 
@@ -61,6 +61,8 @@ def send_email(host, port, username, password, subject, body, mail_to, mail_from
         email['From'] = mail_from
         email['To'] = mail_to
         email['Reply-To'] = reply_to
+        email['Message-ID'] = message_id
+        email['In-Reply-To'] = in_reply_to
         print(email)
 
         server = smtplib.SMTP(host, port)
@@ -420,10 +422,18 @@ def lambda_handler(event, context):
         elif origin_req in [o.strip() for o in origin.split(',')]:
             cors = origin_req
 
+        first_message_id = f'<llvm/llvm-project/pull/{pr_number}/{project}@github.com>'
+        message_id = None
+        in_reply_to = None
+        if event_kind == 'pull_request' and action == 'opened':
+            message_id = first_message_id
+        else:
+            in_reply_to = first_message_id
+
         # send mail
         success = False
         if cors:
-            success = send_email(host, port, username, password, subject, body, mail_to, mail_from, reply_to)
+            success = send_email(host, port, username, password, subject, body, mail_to, mail_from, reply_to, message_id, in_reply_to)
             last_mail_to = mail_to
         else:
             print('mail_to: ', mail_to)
