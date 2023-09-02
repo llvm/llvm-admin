@@ -110,13 +110,12 @@ https://github.com/{user} updated {pr_html}:
 def get_open_email_body(event, patch):
     user = event['sender']['login']
     pr_html = event_get_pr_html_url(event)
-    pr_number = event_get_pr_number(event)
     pr_body = event['pull_request']['body']
 
     return f"""
 https://github.com/{user} created {pr_html}:
 
-{body}
+{pr_body}
 
 {patch}
 """
@@ -335,7 +334,7 @@ def lambda_handler(event, context):
             body = TODO(event, patch)
         elif action == 'milestoned':
             body = TODO(event, patch)
-        elif action == "open":
+        elif action == "opened":
             body = get_open_email_body(event, patch)
         elif action == 'ready_for_review':
             body = TODO(event, patch)
