@@ -173,16 +173,28 @@ def get_pull_request_assigned_email_body(event):
 {user} assigned {pr_html} to {assignee}.
 """
 
-def get_code_review_submitted_email_body(event):
+def get_pull_request_review_submitted_email_body(event):
     user = event['sender']['login']
+    user_html_url = event['sender']['html_url']
     body = event['review']['body']
+    state = event['review']['state']
     pr_html = event_get_pr_html_url(event)
+    action = state
+
+    if state == 'changes_requested':
+        action_string = f"{user_html_url} requested changes to this pull request.\n\n"
+    elif state == 'commented':
+        action_string = f'{user_html_url} commented:\n\n'
+    else:
+        # state == 'approved' or any new states that are added.
+        action_string = f'{user_html_url} {state} this pull request.\n\n'
+
+    comment_string = ''
+    if body:
+        comment_string = f"{body}\n"
 
     return f"""
-{user} wrote:
-
-{body}
-
+{action_string}{comment_string}
 {pr_html}
 """
 
@@ -251,10 +263,15 @@ def lambda_handler(event, context):
         'zorg': LLVM_COMMITS_ADDRESS
     }
 
+    # Handle no-op events earlier to reduce processing time
     event_kind = get_event_kind(event)
     if event_kind == 'issue_comment':
         if 'pull_request' not in event['issue']:
             return get_skip_response("Ignored issue comment")
+    elif event_kind == 'pull_request_review':
+        if event['review']['state'] == 'commented' and not event['review']['body']:
+            return get_skip_response("pull_request_review has no body message")
+
 
     gh_token = os.environ.get('GH_TOKEN')
     gh = github.Github(login_or_token=gh_token)
@@ -360,9 +377,7 @@ def lambda_handler(event, context):
         elif action == 'edited':
             body = TODO(event, patch)
         elif action == 'submitted':
-            if not event['review']['body']:
-                return get_skip_response("pull_request_review has no body message")
-            body = get_code_review_submitted_email_body(event)
+            body = get_pull_request_review_submitted_email_body(event)
         else:
             body = get_generic_email_body(event, patch)
     else:
