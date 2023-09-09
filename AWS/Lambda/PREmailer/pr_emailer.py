@@ -264,12 +264,18 @@ def lambda_handler(event, context):
 
     # Handle no-op events earlier to reduce processing time
     event_kind = get_event_kind(event)
+    action = event['action']
     if event_kind == 'issue_comment':
         if 'pull_request' not in event['issue']:
             return get_skip_response("Ignored issue comment")
     elif event_kind == 'pull_request_review':
         if event['review']['state'] == 'commented' and not event['review']['body']:
             return get_skip_response("pull_request_review has no body message")
+    elif event_kind == 'pull_request':
+        if action == 'labeled' or action == 'unlabeled':
+            return get_skip_response("Ignored labeling action")
+        elif action == 'review_requested' or action == 'review_request_removed':
+            return get_skip_response("Ignored review request action")
 
 
     gh_token = os.environ.get('GH_TOKEN')
@@ -297,7 +303,6 @@ def lambda_handler(event, context):
     # pull_request_review_thread
 
 
-    action = event['action']
     body = ""
 
     if event_kind == 'issue_comment':
@@ -328,8 +333,6 @@ def lambda_handler(event, context):
             body = TODO(event, patch)
         elif action == 'enqueued':
             body = TODO(event, patch)
-        elif action == 'labeled':
-            body = TODO(event, patch)
         elif action == 'locked':
             body = TODO(event, patch)
         elif action == 'milestoned':
@@ -340,15 +343,9 @@ def lambda_handler(event, context):
             body = TODO(event, patch)
         elif action == 'reopened':
             body = TODO(event, patch)
-        elif action == 'review_request_removed':
-            body = TODO(event, patch)
-        elif action == 'review_requested':
-            body = TODO(event, patch)
         elif action == "synchronize":
             body = get_synchronize_email_body(event, patch)
         elif action == 'unassigned':
-            body = TODO(event, patch)
-        elif action == 'unlabled':
             body = TODO(event, patch)
         elif action == 'unlocked':
             body = TODO(event, patch)
