@@ -104,7 +104,7 @@ def get_synchronize_email_body(event, patch):
     pr_number = event_get_pr_number(event)
 
     return f"""
-https://github.com/{user} updated {pr_html}:
+https://github.com/{user} updated {pr_html}
 
 {patch}
 """
@@ -115,7 +115,7 @@ def get_open_email_body(event, patch):
     pr_body = event['pull_request']['body']
 
     return f"""
-https://github.com/{user} created {pr_html}:
+https://github.com/{user} created {pr_html}
 
 {pr_body}
 
