@@ -278,6 +278,9 @@ def lambda_handler(event, context):
             return get_skip_response("Ignored labeling action")
         elif action == 'review_requested' or action == 'review_request_removed':
             return get_skip_response("Ignored review request action")
+    elif event_kind == 'pull_request_review_thread':
+        if action == 'resolved' or action == 'unresolved':
+            return get_skip_response("Ignored resolve action")
 
 
     gh_token = os.environ.get('GH_TOKEN')
@@ -363,12 +366,7 @@ def lambda_handler(event, context):
         else:
             body = get_generic_email_body(event, patch)
     elif event_kind == 'pull_request_review_thread':
-        if action == 'resolved':
-            body = TODO(event, patch)
-        elif action == 'unresolved':
-            body = TODO(event, patch)
-        else:
-            body = get_generic_email_body(event, patch)
+        body = get_generic_email_body(event, patch)
     elif event_kind == 'pull_request_review':
         if action == 'dismissed':
             body = TODO(event, patch)
