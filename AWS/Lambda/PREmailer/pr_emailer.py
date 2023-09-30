@@ -386,56 +386,45 @@ def lambda_handler(event, context):
     gh_pr = gh.get_repo('llvm/llvm-project').get_issue(pr_number).as_pull_request()
     for commit in gh_pr.get_commits():
         project_list.update(create_project_list([f.filename for f in commit.files], project_path_email))
-    # Track the email address last sent to
-    last_mail_to = ""
 
     # Iterate through the list of projects and cross-post if necessary
     #print(project_list)
     #print(body)
-    for project in project_list:
-        # setup the MailTO
-        # separate multiple recipient by comma. eg: "abc@gmail.com, xyz@gmail.com"
-        # mail_to = os.environ['MAIL_TO']
-        mail_to = project_path_email[project]
+    sorted_project_emails = sorted([project_path_email[p] for p in project_list])
+    mail_to = ",".join(sorted_project_emails)
+    if not is_main_branch_event(event, gh_pr):
+        mail_to = LLVM_BRANCH_COMMITS_ADDRESS
 
-        if not is_main_branch_event(event, gh_pr):
-            mail_to = LLVM_BRANCH_COMMITS_ADDRESS
+    if 'MAIL_TO' in os.environ:
+        mail_to = os.environ.get('MAIL_TO')
+    # Setup the mail Subject
+    subject = f"{pr_title} (PR #{pr_number})"
 
-        # If we're sending an additional email to the same address, break instead
-        if mail_to == last_mail_to:
-            break
+    # validate cors access
+    cors = ''
+    if not origin:
+        cors = '*'
+    elif origin_req in [o.strip() for o in origin.split(',')]:
+        cors = origin_req
 
-        if 'MAIL_TO' in os.environ:
-            mail_to = os.environ.get('MAIL_TO')
-        # Setup the mail Subject
-        subject = f"[{project}] {pr_title} (PR #{pr_number})"
+    first_message_id = f'<llvm/llvm-project/pull/{pr_number}@github.com>'
+    message_id = None
+    in_reply_to = None
+    if event_kind == 'pull_request' and action == 'opened':
+        message_id = first_message_id
+    else:
+        in_reply_to = first_message_id
 
-        # validate cors access
-        cors = ''
-        if not origin:
-            cors = '*'
-        elif origin_req in [o.strip() for o in origin.split(',')]:
-            cors = origin_req
-
-        first_message_id = f'<llvm/llvm-project/pull/{pr_number}/{project}@github.com>'
-        message_id = None
-        in_reply_to = None
-        if event_kind == 'pull_request' and action == 'opened':
-            message_id = first_message_id
-        else:
-            in_reply_to = first_message_id
-
-        # send mail
-        success = False
-        if cors:
-            success = send_email(host, port, username, password, subject, body, mail_to, mail_from, reply_to, message_id, in_reply_to)
-            last_mail_to = mail_to
-        else:
-            print('mail_to: ', mail_to)
-            print('mail_from: ', mail_from)
-            print('reply_to: ', reply_to)
-            print(subject)
-            print(body)
+    # send mail
+    success = False
+    if cors:
+        success = send_email(host, port, username, password, subject, body, mail_to, mail_from, reply_to, message_id, in_reply_to)
+    else:
+        print('mail_to: ', mail_to)
+        print('mail_from: ', mail_from)
+        print('reply_to: ', reply_to)
+        print(subject)
+        print(body)
 
 
     # prepare response
