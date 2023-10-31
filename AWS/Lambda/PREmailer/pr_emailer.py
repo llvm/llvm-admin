@@ -408,7 +408,7 @@ def lambda_handler(event, context):
     elif origin_req in [o.strip() for o in origin.split(',')]:
         cors = origin_req
 
-    first_message_id = f'<llvm/llvm-project/pull/{pr_number}@github.com>'
+    first_message_id = f'<llvm.org/llvm/llvm-project/pull/{pr_number}@github.com>'
     message_id = None
     in_reply_to = None
     if event_kind == 'pull_request' and action == 'opened':
