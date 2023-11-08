@@ -175,7 +175,8 @@ Removed:
             # mail_to = os.environ['MAIL_TO']
             mail_to = project_path_email[project]
 
-            if event['ref'] != "refs/heads/master":
+            exclude_branches = ['main', 'master']
+            if not any(x in event['ref'] for x in exclude_branches):
                 mail_to = LLVM_BRANCH_COMMITS_ADDRESS
 
             # If we're sending an additional email to the same address, break instead
@@ -219,4 +220,5 @@ Removed:
         'statusCode': response["statusCode"],
         'body': response["body"]
     }
+
 
