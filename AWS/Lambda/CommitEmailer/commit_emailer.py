@@ -175,8 +175,13 @@ Removed:
             # mail_to = os.environ['MAIL_TO']
             mail_to = project_path_email[project]
 
-            exclude_branches = ['main', 'master']
-            if not any(x in event['ref'] for x in exclude_branches):
+            # Never send mail about personal branches
+            if event['ref'].startswith('refs/heads/users/'):
+                break
+
+            # Everything else on a non-trunk branch should be re-directed to the *branch* commits list
+            trunk_branches = ['refs/heads/main', 'refs/heads/master']
+            if not event['ref'] in trunk_branches:
                 mail_to = LLVM_BRANCH_COMMITS_ADDRESS
 
             # If we're sending an additional email to the same address, break instead
