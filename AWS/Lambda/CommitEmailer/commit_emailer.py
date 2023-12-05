@@ -98,6 +98,17 @@ def lambda_handler(event, context):
         'pstl': LIBCXX_COMMITS_ADDRESS,
         'zorg': LLVM_COMMITS_ADDRESS
     }
+
+    # Never send mail about personal branches
+    if event['ref'].startswith('refs/heads/users/'):
+        return {
+            'statusCode' : 200,
+            'body' : {
+                "status"  : True,
+                "message" : "Ignoring commit to personal branch"
+            }
+        }
+
     # Loop through the commits
     for commit in event['commits']:
         # initialize variables
@@ -175,8 +186,10 @@ Removed:
             # mail_to = os.environ['MAIL_TO']
             mail_to = project_path_email[project]
 
-            exclude_branches = ['main', 'master']
-            if not any(x in event['ref'] for x in exclude_branches):
+            # Everything on a non-personal, non-trunk branches should be
+            # re-directed to the *branch* commits list
+            trunk_branches = ['refs/heads/main', 'refs/heads/master']
+            if not event['ref'] in trunk_branches:
                 mail_to = LLVM_BRANCH_COMMITS_ADDRESS
 
             # If we're sending an additional email to the same address, break instead
