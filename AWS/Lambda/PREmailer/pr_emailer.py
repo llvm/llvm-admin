@@ -398,7 +398,7 @@ def lambda_handler(event, context):
     if 'MAIL_TO' in os.environ:
         mail_to = os.environ.get('MAIL_TO')
     # Setup the mail Subject
-    subject_tag = ' '.join(['[{}]'.format(p) for p in project_list])
+    subject_tag = ' '.join(['[{}]'.format(p) for p in sorted(project_list)])
     subject = f"{subject_tag} {pr_title} (PR #{pr_number})"
 
     # validate cors access
