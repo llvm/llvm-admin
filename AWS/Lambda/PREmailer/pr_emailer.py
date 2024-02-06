@@ -385,6 +385,10 @@ def lambda_handler(event, context):
     project_list = set()
     gh_pr = gh.get_repo('llvm/llvm-project').get_issue(pr_number).as_pull_request()
     for commit in gh_pr.get_commits():
+        if len(commit.parents) > 1:
+            # Ignore merge commits, they will show files changed on main
+            # unrelated to this PR.
+            continue
         project_list.update(create_project_list([f.filename for f in commit.files], project_path_email))
 
     # Iterate through the list of projects and cross-post if necessary
