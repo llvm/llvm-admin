@@ -78,7 +78,7 @@ for issue in repo.get_issues(labels=['infra:commit-access'], state='all'):
                 triage_team.add_to_members(user)
                 print("Done")
             user_list=" ".join([f"@{name}" for name in users])
-            issue.create_comment(f"{user_list} added to the LLVM Triagers team. If you need write access again, please follow these instructions: https://llvm.org/docs/DeveloperPolicy.html#obtaining-commit-access")
+            issue.create_comment(f"{user_list} moved to the LLVM Triagers team. If you need write access again, please follow these instructions: https://llvm.org/docs/DeveloperPolicy.html#obtaining-commit-access")
             issue.edit(state="closed")
             
             
