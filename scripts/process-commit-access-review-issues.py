@@ -60,7 +60,6 @@ for issue in repo.get_issues(labels=['infra:commit-access'], state='all'):
             triagers = get_triagers_from_comment(c)
 
     for r in issue.get_reactions():
-        #print(r.user.login)
         if r.user.login in users:
             users.remove(r.user.login)
     if issue.state != 'closed':
