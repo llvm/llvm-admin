@@ -278,6 +278,8 @@ def lambda_handler(event, context):
             return get_skip_response("Ignored labeling action")
         elif action == 'review_requested' or action == 'review_request_removed':
             return get_skip_response("Ignored review request action")
+        elif action == 'edited':
+            return get_skip_response("Ignored edited action")
     elif event_kind == 'pull_request_review_thread':
         if action == 'resolved' or action == 'unresolved':
             return get_skip_response("Ignored resolve action")
