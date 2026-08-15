@@ -1,0 +1,14 @@
+{
+  "id": 63,
+  "name": "llvm-premerge-cluster-us-central",
+  "visibility": "selected",
+  "allows_public_repositories": true,
+  "default": false,
+  "workflow_restrictions_read_only": false,
+  "restricted_to_workflows": false,
+  "selected_workflows": [],
+  "selected_repositories_url": "https://api.github.com/orgs/llvm/actions/runner-groups/63/repositories",
+  "runners_url": "https://api.github.com/orgs/llvm/actions/runner-groups/63/runners",
+  "hosted_runners_url": "https://api.github.com/orgs/llvm/actions/runner-groups/63/hosted-runners",
+  "inherited": false
+}

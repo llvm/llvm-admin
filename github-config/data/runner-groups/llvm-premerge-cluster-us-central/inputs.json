@@ -1,0 +1,9 @@
+{
+  "name": "llvm-premerge-cluster-us-central",
+  "visibility": "all",
+  "allows_public_repositories": true,
+  "default": false,
+  "workflow_restrictions_read_only": false,
+  "restricted_to_workflows": false,
+  "selected_workflows": []
+}
