@@ -2,10 +2,20 @@ variable "github_llvm_org_token" {
   description = "Token for updating github settings"
   type = string
   sensitive = true
+  # Only allow fine-grained access tokens since the classic tokens have
+  # very coarse grained permissions and we want to ensure the scope
+  # of the tokens we use is limited as much as possible.
+  # TODO: Only allow fine-grained access tokens with the minimum required permissions.
+  validation {
+    condition = startswith(var.github_llvm_org_token, "github_pat_")
+    error_message = "Please use a fine-grained access token"
+  }
 }
 
 provider "github" {
   owner = "llvm"
+  # Use a fine-grained token with the permissions:
+  # * Organization Self-Hosted Runners: read/write
   token = var.github_llvm_org_token
 }
 
